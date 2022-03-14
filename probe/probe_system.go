@@ -6,7 +6,7 @@ import (
 	"nodepanels-probe/util"
 )
 
-func GetHostInfo(info ProbeInfo) ProbeInfo {
+func GetHostInfo() HostInfo {
 
 	defer func() {
 		err := recover()
@@ -21,14 +21,15 @@ func GetHostInfo(info ProbeInfo) ProbeInfo {
 	kernelVersion, _ := host.KernelVersion()
 	platform, platformFamily, platformVersion, _ := host.PlatformInformation()
 
-	info.HostInfo.Hostname = infoStat.Hostname
-	info.HostInfo.Uptime = uptime
-	info.HostInfo.KernelArch = kernelArch
-	info.HostInfo.KernelVersion = kernelVersion
-	info.HostInfo.Os = infoStat.OS
-	info.HostInfo.Platform = platform
-	info.HostInfo.PlatformFamily = platformFamily
-	info.HostInfo.PlatformVersion = platformVersion
+	hostInfo := HostInfo{}
+	hostInfo.Hostname = infoStat.Hostname
+	hostInfo.Uptime = uptime
+	hostInfo.KernelArch = kernelArch
+	hostInfo.KernelVersion = kernelVersion
+	hostInfo.Os = infoStat.OS
+	hostInfo.Platform = platform
+	hostInfo.PlatformFamily = platformFamily
+	hostInfo.PlatformVersion = platformVersion
 
-	return info
+	return hostInfo
 }

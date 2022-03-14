@@ -6,7 +6,7 @@ import (
 	"nodepanels-probe/util"
 )
 
-func GetMemInfo(info ProbeInfo) ProbeInfo {
+func GetMemInfo() MemInfo {
 
 	defer func() {
 		err := recover()
@@ -18,16 +18,17 @@ func GetMemInfo(info ProbeInfo) ProbeInfo {
 	virtualMemoryStat, _ := mem.VirtualMemory()
 	swapMemory, _ := mem.SwapMemory()
 
-	info.MemInfo.Mem = virtualMemoryStat.Total
-	info.MemInfo.Swap = swapMemory.Total
+	memInfo := MemInfo{}
+	memInfo.Mem = virtualMemoryStat.Total
+	memInfo.Swap = swapMemory.Total
 
 	//全局变量，给进程计算实际使用内存
 	memTotal = uint(virtualMemoryStat.Total / 1024 / 1024)
 
-	return info
+	return memInfo
 }
 
-func GetMemUsage(probeUsage ProbeUsage) ProbeUsage {
+func GetMemUsage() Mem {
 
 	defer func() {
 		err := recover()
@@ -40,12 +41,14 @@ func GetMemUsage(probeUsage ProbeUsage) ProbeUsage {
 
 	JudgeMemWarning(util.String2int(util.Float642string(util.RoundFloat64(virtualMemoryStat.UsedPercent, 0))))
 
-	probeUsage.Mem.Usage = util.RoundFloat64(virtualMemoryStat.UsedPercent, 2)
+	mem := Mem{}
 
-	return probeUsage
+	mem.Usage = util.RoundFloat64(virtualMemoryStat.UsedPercent, 2)
+
+	return mem
 }
 
-func GetSwapUsage(probeUsage ProbeUsage) ProbeUsage {
+func GetSwapUsage() Swap {
 
 	defer func() {
 		err := recover()
@@ -54,9 +57,11 @@ func GetSwapUsage(probeUsage ProbeUsage) ProbeUsage {
 		}
 	}()
 
+	swap := Swap{}
+
 	swapMemory, _ := mem.SwapMemory()
 
-	probeUsage.Swap.Usage = util.RoundFloat64(swapMemory.UsedPercent, 2)
+	swap.Usage = util.RoundFloat64(swapMemory.UsedPercent, 2)
 
-	return probeUsage
+	return swap
 }

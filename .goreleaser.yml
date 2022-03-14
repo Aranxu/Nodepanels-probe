@@ -5,7 +5,7 @@ builds:
   - env:
       - CGO_ENABLED=0
     id: "nodepanels-probe"
-      binary: "nodepanels-probe-{{ .Os }}-{{ .Arch }}"
+    binary: "nodepanels-probe-{{ .Os }}-{{ .Arch }}"
     goos:
       - linux
       - windows

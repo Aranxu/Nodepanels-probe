@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func GetDiskInfo(info ProbeInfo) ProbeInfo {
+func GetDiskInfo() []DiskInfo {
 
 	defer func() {
 		err := recover()
@@ -18,6 +18,8 @@ func GetDiskInfo(info ProbeInfo) ProbeInfo {
 	}()
 
 	partitionInfo, _ := disk.Partitions(false)
+
+	diskInfoList := []DiskInfo{}
 
 	for _, val := range partitionInfo {
 
@@ -29,7 +31,7 @@ func GetDiskInfo(info ProbeInfo) ProbeInfo {
 		diskInfo.Fstype = val.Fstype
 		diskInfo.Total = usage.Total
 
-		info.DiskInfo = append(info.DiskInfo, diskInfo)
+		diskInfoList = append(diskInfoList, diskInfo)
 	}
 
 	//记录初始读写数据
@@ -43,10 +45,10 @@ func GetDiskInfo(info ProbeInfo) ProbeInfo {
 		diskInitWriteBytes[key] = val.WriteBytes
 	}
 
-	return info
+	return diskInfoList
 }
 
-func GetDiskUsage(probeUsage ProbeUsage) ProbeUsage {
+func GetDiskUsage() []Disk {
 
 	defer func() {
 		err := recover()
@@ -56,6 +58,8 @@ func GetDiskUsage(probeUsage ProbeUsage) ProbeUsage {
 	}()
 
 	ioData := getDiskIOCounters()
+
+	diskList := []Disk{}
 
 	for key, val := range ioData {
 
@@ -76,10 +80,10 @@ func GetDiskUsage(probeUsage ProbeUsage) ProbeUsage {
 		diskInitReadBytes[key] = val.ReadBytes
 		diskInitWriteBytes[key] = val.WriteBytes
 
-		probeUsage.Disk = append(probeUsage.Disk, disk)
+		diskList = append(diskList, disk)
 	}
 
-	return probeUsage
+	return diskList
 }
 
 func getDiskIOCounters() map[string]disk.IOCountersStat {

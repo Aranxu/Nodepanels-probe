@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func GetCpuInfo(info ProbeInfo) ProbeInfo {
+func GetCpuInfo() CpuInfo {
 
 	defer func() {
 		err := recover()
@@ -37,19 +37,20 @@ func GetCpuInfo(info ProbeInfo) ProbeInfo {
 
 	logicCore, _ := cpu.Counts(true)
 
-	info.CpuInfo.CpuNums = cpuNums
-	info.CpuInfo.PhysicalCores = physicalCores
-	info.CpuInfo.LogicCore = logicCore
+	cpuInfo := CpuInfo{}
+	cpuInfo.CpuNums = cpuNums
+	cpuInfo.PhysicalCores = physicalCores
+	cpuInfo.LogicCore = logicCore
 
-	info.CpuInfo.Model = infoStat[0].ModelName
-	info.CpuInfo.VendorID = infoStat[0].VendorID
-	info.CpuInfo.Mhz = infoStat[0].Mhz
-	info.CpuInfo.Cache = infoStat[0].CacheSize
+	cpuInfo.Model = infoStat[0].ModelName
+	cpuInfo.VendorID = infoStat[0].VendorID
+	cpuInfo.Mhz = infoStat[0].Mhz
+	cpuInfo.Cache = infoStat[0].CacheSize
 
-	return info
+	return cpuInfo
 }
 
-func GetCpuUsage(probeUsage ProbeUsage) ProbeUsage {
+func GetCpuUsage() Cpu {
 
 	defer func() {
 		err := recover()
@@ -58,10 +59,12 @@ func GetCpuUsage(probeUsage ProbeUsage) ProbeUsage {
 		}
 	}()
 
+	cpuUsage := Cpu{}
+
 	combineCpuUsage, _ := cpu.Percent(0, false)
 
 	for _, ccu := range combineCpuUsage {
-		probeUsage.Cpu.Total = util.RoundFloat64(ccu, 2)
+		cpuUsage.Total = util.RoundFloat64(ccu, 2)
 		JudgeCpuWarning(util.String2int(fmt.Sprintf("%.0f", ccu)))
 	}
 
@@ -72,8 +75,8 @@ func GetCpuUsage(probeUsage ProbeUsage) ProbeUsage {
 		for _, pcu := range perCpuUsage {
 			perCpuList = append(perCpuList, util.RoundFloat64(pcu, 1))
 		}
-		probeUsage.Cpu.Per = perCpuList
+		cpuUsage.Per = perCpuList
 	}
 
-	return probeUsage
+	return cpuUsage
 }

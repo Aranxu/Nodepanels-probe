@@ -7,7 +7,7 @@ import (
 	"nodepanels-probe/util"
 )
 
-func GetProcessUsage(probeUsage ProbeUsage) ProbeUsage {
+func GetProcessUsage() []ProcessUsage {
 
 	defer func() {
 		err := recover()
@@ -82,14 +82,12 @@ func GetProcessUsage(probeUsage ProbeUsage) ProbeUsage {
 		}
 	}
 
-	probeUsage.Process.ProcessList = processUsageList
-
 	initProcessUsageMap = initProcessUsageTempMap
 
-	return probeUsage
+	return processUsageList
 }
 
-func GetProcessNum(probeUsage ProbeUsage) ProbeUsage {
+func GetProcessNum() uint64 {
 
 	defer func() {
 		err := recover()
@@ -100,9 +98,7 @@ func GetProcessNum(probeUsage ProbeUsage) ProbeUsage {
 
 	infoStat, _ := host.Info()
 
-	probeUsage.Process.Num = infoStat.Procs
-
-	return probeUsage
+	return infoStat.Procs
 }
 
 type ProcessUsage struct {

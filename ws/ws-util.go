@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"nodepanels-probe/config"
 	"nodepanels-probe/util"
@@ -54,7 +55,8 @@ func ExeScript(connect *websocket.Conn, command Command) {
 
 	//生成入参临时文件
 	tempNo := util.Int642string(time.Now().UnixNano())
-	newFile, _ := os.Create(filepath.Join(util.Exepath(), toolType+"-"+tempNo+".temp"))
+	os.MkdirAll(filepath.Join(util.Exepath(), "temp"), fs.ModeDir)
+	newFile, _ := os.Create(filepath.Join(util.Exepath(), "temp", toolType+"-"+tempNo+".temp"))
 	newFile.Write([]byte(toolParam))
 	newFile.Close()
 
@@ -78,6 +80,9 @@ func ExeScript(connect *websocket.Conn, command Command) {
 
 	if err := cmd.Wait(); err != nil {
 		util.LogError("Error waiting for command execution: " + fmt.Sprintf("%s", err))
+		os.Remove(filepath.Join(util.Exepath(), "temp", toolType+"-"+tempNo+".temp"))
+	} else {
+		os.Remove(filepath.Join(util.Exepath(), "temp", toolType+"-"+tempNo+".temp"))
 	}
 
 }

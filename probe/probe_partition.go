@@ -6,7 +6,7 @@ import (
 	"nodepanels-probe/util"
 )
 
-func GetPartitionUsage(probeUsage ProbeUsage) ProbeUsage {
+func GetPartitionUsage() []Partition {
 
 	defer func() {
 		err := recover()
@@ -17,6 +17,8 @@ func GetPartitionUsage(probeUsage ProbeUsage) ProbeUsage {
 
 	partitionInfo, _ := disk.Partitions(false)
 
+	partitionList := []Partition{}
+
 	for _, val := range partitionInfo {
 
 		usage, _ := disk.Usage(val.Mountpoint)
@@ -25,8 +27,8 @@ func GetPartitionUsage(probeUsage ProbeUsage) ProbeUsage {
 		partitionInfo.Device = val.Device
 		partitionInfo.Used = usage.Used
 
-		probeUsage.Partition = append(probeUsage.Partition, partitionInfo)
+		partitionList = append(partitionList, partitionInfo)
 	}
 
-	return probeUsage
+	return partitionList
 }

@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-//go:generate goversioninfo -icon=favicon.ico
+//go:generate goversioninfo -arm -icon=favicon.ico
 
 func main() {
 
@@ -65,8 +65,8 @@ func main() {
 			fmt.Println(util.Logo())
 			fmt.Println("====================================")
 			fmt.Println("App name    : nodepanels-probe")
-			fmt.Println("Version     : v1.0.2")
-			fmt.Println("Update Time : 20210819")
+			fmt.Println("Version     : v1.0.3")
+			fmt.Println("Update Time : 20220314")
 			fmt.Println("\nMade by     : https://nodepanels.com")
 			fmt.Println("====================================")
 			return
@@ -172,15 +172,15 @@ func sendUsageInfo() {
 	}()
 
 	probeUsage := probe.ProbeUsage{}
-	probeUsage = probe.GetCpuUsage(probeUsage)
-	probeUsage = probe.GetMemUsage(probeUsage)
-	probeUsage = probe.GetSwapUsage(probeUsage)
-	probeUsage = probe.GetDiskUsage(probeUsage)
-	probeUsage = probe.GetPartitionUsage(probeUsage)
-	probeUsage = probe.GetNetUsage(probeUsage)
-	probeUsage = probe.GetProcessNum(probeUsage)
-	probeUsage = probe.GetProcessUsage(probeUsage)
-	probeUsage = probe.GetLoadUsage(probeUsage)
+	probeUsage.Cpu = probe.GetCpuUsage()
+	probeUsage.Mem = probe.GetMemUsage()
+	probeUsage.Swap = probe.GetSwapUsage()
+	probeUsage.Disk = probe.GetDiskUsage()
+	probeUsage.Partition = probe.GetPartitionUsage()
+	probeUsage.Net = probe.GetNetUsage()
+	probeUsage.Process.Num = probe.GetProcessNum()
+	probeUsage.Process.ProcessList = probe.GetProcessUsage()
+	probeUsage.Load.SysLoad = probe.GetLoadUsage()
 	probeUsage.Unix = time.Now().Unix()
 
 	msg, _ := json.Marshal(probeUsage)
@@ -203,11 +203,11 @@ func sendServerInfo() {
 
 	probeInfo := probe.ProbeInfo{}
 	probeInfo.Version = config.Version
-	probeInfo = probe.GetHostInfo(probeInfo)
-	probeInfo = probe.GetCpuInfo(probeInfo)
-	probeInfo = probe.GetMemInfo(probeInfo)
-	probeInfo = probe.GetDiskInfo(probeInfo)
-	probeInfo = probe.GetNetInfo(probeInfo)
+	probeInfo.HostInfo = probe.GetHostInfo()
+	probeInfo.CpuInfo = probe.GetCpuInfo()
+	probeInfo.MemInfo = probe.GetMemInfo()
+	probeInfo.DiskInfo = probe.GetDiskInfo()
+	probeInfo.NetInfo = probe.GetNetInfo()
 
 	msg, _ := json.Marshal(probeInfo)
 

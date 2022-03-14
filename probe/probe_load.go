@@ -6,7 +6,7 @@ import (
 	"nodepanels-probe/util"
 )
 
-func GetLoadUsage(probeUsage ProbeUsage) ProbeUsage {
+func GetLoadUsage() float64 {
 
 	defer func() {
 		err := recover()
@@ -17,8 +17,6 @@ func GetLoadUsage(probeUsage ProbeUsage) ProbeUsage {
 
 	avg, _ := load.Avg()
 
-	probeUsage.Load.SysLoad = avg.Load1
-
-	return probeUsage
+	return avg.Load1
 
 }

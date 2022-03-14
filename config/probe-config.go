@@ -1,6 +1,6 @@
 package config
 
-const Version = "v1.0.2"
+const Version = "v1.0.3"
 
 var WsUrl = "wss://ws.nodepanels.com"
 var AgentUrl = "https://agent.nodepanels.com"

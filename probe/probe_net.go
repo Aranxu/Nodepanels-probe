@@ -9,7 +9,7 @@ import (
 	"nodepanels-probe/util"
 )
 
-func GetNetInfo(info ProbeInfo) ProbeInfo {
+func GetNetInfo() NetInfo {
 
 	defer func() {
 		err := recover()
@@ -34,17 +34,18 @@ func GetNetInfo(info ProbeInfo) ProbeInfo {
 
 	privateIp := util.GetPrivateIp()
 
-	info.NetInfo.PublicIp = detailInfo.Query
-	info.NetInfo.PrivateIp = privateIp
-	info.NetInfo.DetailInfo = detailInfo
+	netInfo := NetInfo{}
+	netInfo.PublicIp = detailInfo.Query
+	netInfo.PrivateIp = privateIp
+	netInfo.DetailInfo = detailInfo
 
-	info.NetInfo.AgentIp = util.GetAgentIp()
-	info.NetInfo.ApiIp = util.GetApiIp()
+	netInfo.AgentIp = util.GetAgentIp()
+	netInfo.ApiIp = util.GetApiIp()
 
-	return info
+	return netInfo
 }
 
-func GetNetUsage(probeUsage ProbeUsage) ProbeUsage {
+func GetNetUsage() Net {
 
 	defer func() {
 		err := recover()
@@ -53,22 +54,24 @@ func GetNetUsage(probeUsage ProbeUsage) ProbeUsage {
 		}
 	}()
 
+	netUsage := Net{}
+
 	ioCounters, _ := net.IOCounters(false)
 
 	if ioCounters[0].BytesRecv > netInitRxBytes {
-		probeUsage.Net.Rx = ioCounters[0].BytesRecv - netInitRxBytes
+		netUsage.Rx = ioCounters[0].BytesRecv - netInitRxBytes
 	} else {
-		probeUsage.Net.Rx = 0
+		netUsage.Rx = 0
 	}
 	if ioCounters[0].BytesSent > netInitTxBytes {
-		probeUsage.Net.Tx = ioCounters[0].BytesSent - netInitTxBytes
+		netUsage.Tx = ioCounters[0].BytesSent - netInitTxBytes
 	} else {
-		probeUsage.Net.Tx = 0
+		netUsage.Tx = 0
 	}
 
 	netInitRxBytes = ioCounters[0].BytesRecv
 	netInitTxBytes = ioCounters[0].BytesSent
 
-	return probeUsage
+	return netUsage
 
 }
