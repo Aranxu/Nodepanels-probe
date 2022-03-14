@@ -1,6 +1,6 @@
 # <img src="https://github.com/Aranxu/Nodepanels-probe/blob/main/favicon.ico" width = "40" height = "40" alt="" align=center/> Nodepanels-probe
 
-<img src="https://img.shields.io/badge/Go-1.17-ff69b4"/> <img src="https://img.shields.io/badge/version-v1.0.2-orange"/> <img src="https://img.shields.io/badge/TG-@nodepanels-green?logo=telegram&style=plastic"/>
+<img src="https://img.shields.io/badge/Go-1.17-ff69b4"/> <img src="https://img.shields.io/badge/version-v1.0.3-orange"/> <img src="https://img.shields.io/badge/TG-@nodepanels-green?logo=telegram&style=plastic"/>
 
 Nodepanels探针，采集服务器基础数据，服务器与本系统的连接通道
 
@@ -10,9 +10,9 @@ Nodepanels探针，采集服务器基础数据，服务器与本系统的连接�
 
 ### 程序信息：
 
-版本：`v1.0.2`
+版本：`v1.0.3`
 
-更新日期：`2021/09/01`
+更新日期：`2022/03/14`
 
 支持系统：`Linux 32/64位` | `Linux ARM 32/64位` | `Windows 32/64位`
 
@@ -111,16 +111,16 @@ Nodepanels探针，采集服务器基础数据，服务器与本系统的连接�
         </tr>
         <tr>
             <th>临时文件存放到temp目录</th>
-            <th></th>
-            <th>0%</th>
-            <th></th>
+            <th>✔</th>
+            <th>100%</th>
+            <th>2022.03.14</th>
             <th></th>
         </tr>
         <tr>
             <th>调用工具包后删除临时文件</th>
-            <th></th>
-            <th>0%</th>
-            <th></th>
+            <th>✔</th>
+            <th>100%</th>
+            <th>2022.03.14</th>
             <th></th>
         </tr>
         <tr>
