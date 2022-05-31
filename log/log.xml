@@ -1,0 +1,11 @@
+<seelog type="sync" minlevel="debug" maxlevel="error">
+    <outputs formatid="main">
+        <filter levels="debug,info,warn,error">
+            <console formatid="main"/>
+        </filter>
+        <rollingfile formatid="main" type="size" filename="" maxsize="1048576" maxrolls="1" />
+    </outputs>
+    <formats>
+        <format id="main" format="%Date %Time [%LEV] | %Msg%n"/>
+    </formats>
+</seelog>

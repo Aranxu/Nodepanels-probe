@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/process"
+	"nodepanels-probe/config"
+	"nodepanels-probe/log"
 	"nodepanels-probe/util"
 )
 
@@ -12,7 +14,7 @@ func GetProcessUsage() []ProcessUsage {
 	defer func() {
 		err := recover()
 		if err != nil {
-			util.LogError("Get process usage info error : " + fmt.Sprintf("%s", err))
+			log.Error("Get process usage info error : " + fmt.Sprintf("%s", err))
 		}
 	}()
 
@@ -20,7 +22,7 @@ func GetProcessUsage() []ProcessUsage {
 		initProcessUsageMap = make(map[string]ProcessUsage)
 	}
 
-	processCmdList := util.GetConfig().Monitor.Rule.Process
+	processCmdList := config.GetConfig().Monitor.Rule.Process
 	processCmdMap := make(map[string]int)
 	for _, val := range processCmdList {
 		processCmdMap[val] = 1
@@ -49,8 +51,8 @@ func GetProcessUsage() []ProcessUsage {
 			processUsage.Pid = pid
 			processUsage.Name = name
 			processUsage.Cmd = cmd
-			processUsage.CpuPercent = util.RoundFloat64(cpuPercent, 1)
-			processUsage.MemPercent = util.RoundFloat32(memPercent, 1)
+			processUsage.CpuPercent = util.Round(cpuPercent, 1)
+			processUsage.MemPercent = util.Round(float64(memPercent), 1)
 
 			if _, ok := initProcessUsageMap[cmd]; ok {
 				if ioData != nil {
@@ -92,7 +94,7 @@ func GetProcessNum() uint64 {
 	defer func() {
 		err := recover()
 		if err != nil {
-			util.LogError("Get process num error : " + fmt.Sprintf("%s", err))
+			log.Error("Get process num error : " + fmt.Sprintf("%s", err))
 		}
 	}()
 
@@ -104,7 +106,7 @@ func GetProcessNum() uint64 {
 type ProcessUsage struct {
 	Name       string  `json:"name"`
 	CpuPercent float64 `json:"cpu"`
-	MemPercent float32 `json:"mem"`
+	MemPercent float64 `json:"mem"`
 	DiskWrite  uint64  `json:"write"`
 	DiskRead   uint64  `json:"read"`
 	Cmd        string  `json:"cmd"`

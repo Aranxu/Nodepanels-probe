@@ -2,18 +2,31 @@ package probe
 
 import (
 	"fmt"
+	"github.com/gookit/goutil/envutil"
 	"github.com/shirou/gopsutil/v3/disk"
-	"nodepanels-probe/util"
-	"runtime"
+	"nodepanels-probe/log"
 	"strings"
 )
+
+func InitDiskIO() {
+	//记录初始读写数据
+	ioData := getDiskIOCounters()
+
+	diskInitReadBytes = make(map[string]uint64)
+	diskInitWriteBytes = make(map[string]uint64)
+
+	for key, val := range ioData {
+		diskInitReadBytes[key] = val.ReadBytes
+		diskInitWriteBytes[key] = val.WriteBytes
+	}
+}
 
 func GetDiskInfo() []DiskInfo {
 
 	defer func() {
 		err := recover()
 		if err != nil {
-			util.LogError("get disk info error : " + fmt.Sprintf("%s", err))
+			log.Error("get disk info error : " + fmt.Sprintf("%s", err))
 		}
 	}()
 
@@ -34,17 +47,6 @@ func GetDiskInfo() []DiskInfo {
 		diskInfoList = append(diskInfoList, diskInfo)
 	}
 
-	//记录初始读写数据
-	ioData := getDiskIOCounters()
-
-	diskInitReadBytes = make(map[string]uint64)
-	diskInitWriteBytes = make(map[string]uint64)
-
-	for key, val := range ioData {
-		diskInitReadBytes[key] = val.ReadBytes
-		diskInitWriteBytes[key] = val.WriteBytes
-	}
-
 	return diskInfoList
 }
 
@@ -53,7 +55,7 @@ func GetDiskUsage() []Disk {
 	defer func() {
 		err := recover()
 		if err != nil {
-			util.LogError("get disk io usage info error : " + fmt.Sprintf("%s", err))
+			log.Error("get disk io usage info error : " + fmt.Sprintf("%s", err))
 		}
 	}()
 
@@ -91,12 +93,12 @@ func getDiskIOCounters() map[string]disk.IOCountersStat {
 	defer func() {
 		err := recover()
 		if err != nil {
-			util.LogError("Get disk IO counters error : " + fmt.Sprintf("%s", err))
+			log.Error("Get disk IO counters error : " + fmt.Sprintf("%s", err))
 		}
 	}()
 
 	partitionInfo, _ := disk.IOCounters()
-	if runtime.GOOS == "linux" {
+	if envutil.IsLinux() {
 		disks := make([]string, 0)
 		diskMap := make(map[string]string)
 		for _, val := range partitionInfo {

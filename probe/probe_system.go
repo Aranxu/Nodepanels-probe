@@ -3,7 +3,7 @@ package probe
 import (
 	"fmt"
 	"github.com/shirou/gopsutil/v3/host"
-	"nodepanels-probe/util"
+	"nodepanels-probe/log"
 )
 
 func GetHostInfo() HostInfo {
@@ -11,7 +11,7 @@ func GetHostInfo() HostInfo {
 	defer func() {
 		err := recover()
 		if err != nil {
-			util.LogError("Get host info error : " + fmt.Sprintf("%s", err))
+			log.Error("Get host info error : " + fmt.Sprintf("%s", err))
 		}
 	}()
 

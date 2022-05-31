@@ -3,7 +3,7 @@ package probe
 import (
 	"fmt"
 	"github.com/shirou/gopsutil/v3/disk"
-	"nodepanels-probe/util"
+	"nodepanels-probe/log"
 )
 
 func GetPartitionUsage() []Partition {
@@ -11,7 +11,7 @@ func GetPartitionUsage() []Partition {
 	defer func() {
 		err := recover()
 		if err != nil {
-			util.LogError("get partition usage info error : " + fmt.Sprintf("%s", err))
+			log.Error("get partition usage info error : " + fmt.Sprintf("%s", err))
 		}
 	}()
 

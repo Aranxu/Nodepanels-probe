@@ -3,145 +3,142 @@ package ws
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gookit/goutil/timex"
 	"github.com/gorilla/websocket"
 	"nodepanels-probe/config"
-	"nodepanels-probe/probe"
-	"nodepanels-probe/util"
+	"nodepanels-probe/log"
+	"nodepanels-probe/usage"
+	"strings"
 	"time"
 )
 
-func CreateAgentConn() {
+var WebsocketConn *websocket.Conn = nil
 
+func Connect() {
 	defer func() {
 		err := recover()
 		if err != nil {
-			util.LogError("Abnormal connection with proxy program：" + fmt.Sprintf("%s", err))
+			log.Error("Abnormal connection with proxy program：" + fmt.Sprintf("%s", err))
 		}
 	}()
 
-	dialer := websocket.Dialer{}
-
-	tryCount := 0
+	dialer := websocket.Dialer{
+		HandshakeTimeout: 10 * time.Second,
+	}
 
 TryConn:
 
-	if tryCount != 0 {
-		time.Sleep(time.Second * 10)
-	}
-	tryCount++
-
-	util.LogDebug("Try to establish a connection with the proxy server...")
-	wsConnect, _, err := dialer.Dial(config.WsUrl+"/ws/v1/"+util.GetHostId(), nil)
+	log.Info("Try to establish a connection with the proxy server...")
+	wsConnect, _, err := dialer.Dial(config.WsUrl+"/ws/v1/"+config.GetSid(), nil)
+	WebsocketConn = wsConnect
 	if nil != err {
-		util.LogError("Failed to connect to the proxy server, trying to reconnect... ")
+		fmt.Println(err)
+		log.Info("Failed to connect to the proxy server, will retry after 10 seconds ")
+		time.Sleep(time.Second * 10)
 		goto TryConn
 	}
-	util.LogDebug("Successfully connected to the proxy server ")
+	log.Info("Successfully connected to the proxy server ")
 
-	go readAgentMsg(wsConnect)
+	go readMsg()
 
-	go wsHeartBeat(wsConnect)
+	go heartBeat()
 
 	return
 }
 
-func wsHeartBeat(connect *websocket.Conn) {
-
+func heartBeat() {
 	defer func() {
 		err := recover()
 		if err != nil {
-			util.LogError("Send ws heartbeat error :" + fmt.Sprintf("%s", err))
+			log.Error("Send ws heartbeat error :" + fmt.Sprintf("%s", err))
 		}
 	}()
 
 	for {
-
-		if connect == nil {
+		if WebsocketConn == nil {
 			return
 		}
 
-		SendMsg(connect, "ping")
+		SendMsg("ping")
 		time.Sleep(30000 * time.Millisecond)
 	}
 }
 
-func readAgentMsg(connect *websocket.Conn) {
-
+func readMsg() {
 	defer func() {
 		err := recover()
 		if err != nil {
-			util.LogError("Receive agent message error :" + fmt.Sprintf("%s", err))
+			log.Error("Receive agent message error :" + fmt.Sprintf("%s", err))
 		}
 	}()
 
 	for {
-
-		if connect == nil {
-			go CreateAgentConn()
+		if WebsocketConn == nil {
+			log.Info("Disconnect from proxy server, will retry after 10 seconds ")
+			time.Sleep(time.Second * 10)
+			go Connect()
 			return
 		}
 
-		messageType, messageData, err := connect.ReadMessage()
+		messageType, messageData, err := WebsocketConn.ReadMessage()
 		if nil != err {
-			util.LogError("Failed to connect to the proxy server：" + fmt.Sprintf("%s", err))
-			util.LogError("Trying to reconnect... ")
-			connect = nil
+			WebsocketConn = nil
 		}
 
 		switch messageType {
 		case websocket.TextMessage:
-			go handleMsg(connect, string(messageData))
-		case websocket.BinaryMessage:
+			go handleMsg(string(messageData))
 
 		default:
-			SendMsg(connect, "bad request")
+			SendMsg("bad request")
 		}
 	}
 }
 
-func SendMsg(connect *websocket.Conn, msg string) {
-
+func SendMsg(msg string) {
 	defer func() {
 		err := recover()
 		if err != nil {
-			util.LogError("SendMsg error :" + fmt.Sprintf("%s", err))
+			log.Error("SendMsg error :" + fmt.Sprintf("%s", err))
 		}
 	}()
 
-	if connect != nil {
-		connect.WriteMessage(websocket.TextMessage, []byte(msg))
+	if WebsocketConn != nil {
+		WebsocketConn.WriteMessage(websocket.TextMessage, []byte(msg))
 	}
 }
 
-func handleMsg(connect *websocket.Conn, message string) {
-
+func handleMsg(message string) {
 	defer func() {
 		err := recover()
 		if err != nil {
-			util.LogError("HandleMsg error :" + fmt.Sprintf("%s", err))
+			log.Error("HandleMsg error :" + fmt.Sprintf("%s", err))
 		}
 	}()
 
 	if message != "pong" {
-
 		command := Command{}
 		json.Unmarshal([]byte(message), &command)
 
-		if command.Tool.Type == "probe-version" {
-			util.LogInfo("[COMMAND] Version probe")
-			SendMsg(connect, "{\"toolType\":\"probe-version\",\"serverId\":\""+util.GetHostId()+"\",\"msg\":\""+config.Version+"\"}")
-			SendMsg(connect, "{\"toolType\":\"probe-version\",\"serverId\":\""+util.GetHostId()+"\",\"msg\":\"END\"}")
-		} else if command.Tool.Type == "probe-upgrade-back" {
-			probe.Upgrade(command.Tool.Param)
-		} else if command.Tool.Type == "probe-shutdown-back" {
-			probe.ShutDown()
-		} else if command.Tool.Type == "probe-cmd-back" {
-			probe.ExeCmd(command.Tool.Param)
-		} else {
-			ExeScript(connect, command)
-		}
+		CallTool(command)
 	}
+}
 
+// SendUsage 新开线程循环获取系统使用率(2秒粒度)
+func SendUsage() {
+	for {
+		if WebsocketConn != nil && config.GetConfig().Usage > timex.NowUnix() {
+			go SendMsg(PrintResult(config.GetSid(), "usage", usage.Usage()))
+		}
+		time.Sleep(2 * time.Second)
+	}
+}
+
+func PrintResult(pid string, toolType string, msg string) string {
+	msg = strings.ReplaceAll(msg, "\\", "\\\\")
+	msg = strings.ReplaceAll(msg, "\n", "\\n")
+	msg = strings.ReplaceAll(msg, "\"", "\\\"")
+	return "{\"pid\":\"" + pid + "\"," + "\"toolType\":\"" + toolType + "\",\"serverId\":\"" + config.GetSid() + "\",\"msg\":\"" + msg + "\"}"
 }
 
 type Command struct {
@@ -152,9 +149,6 @@ type Command struct {
 
 type CommandTool struct {
 	Version string `json:"version"`
-	Name    string `json:"name"`
-	Url     string `json:"url"`
 	Type    string `json:"type"`
 	Param   string `json:"param"`
-	Timeout int    `json:"timeout"`
 }

@@ -1,84 +1,11 @@
 package probe
 
 import (
+	"encoding/json"
 	"fmt"
-	"nodepanels-probe/util"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"runtime"
+	"nodepanels-probe/config"
+	"nodepanels-probe/log"
 )
-
-func Upgrade(url string) {
-
-	defer func() {
-		err := recover()
-		if err != nil {
-			util.LogError("Update probe error : " + fmt.Sprintf("%s", err))
-		}
-	}()
-
-	util.LogInfo("[COMMAND] Upgrade probe - back")
-
-	util.Download(url, filepath.Join(util.Exepath(), "nodepanels-probe.temp"))
-
-	if runtime.GOOS == "windows" {
-
-		exec.Command("cmd", "/C", "net stop Nodepanels-probe").Output()
-	}
-	if runtime.GOOS == "linux" {
-		os.Chmod(util.Exepath()+"/nodepanels-probe.temp", 0777)
-
-		os.Rename(util.Exepath()+"/nodepanels-probe.temp", util.Exepath()+"/nodepanels-probe")
-
-		exec.Command("sh", "-c", "service nodepanels restart").Output()
-	}
-
-}
-
-func ShutDown() {
-
-	defer func() {
-		err := recover()
-		if err != nil {
-			util.LogError("ShutDown probe error : " + fmt.Sprintf("%s", err))
-		}
-	}()
-
-	util.LogInfo("[COMMAND] Shutdown probe - back")
-
-	if runtime.GOOS == "windows" {
-
-		exec.Command("cmd", "/C", "net stop Nodepanels-probe").Output()
-	}
-	if runtime.GOOS == "linux" {
-
-		exec.Command("sh", "-c", "service nodepanels stop").Output()
-
-	}
-
-}
-
-func ExeCmd(cmd string) string {
-
-	defer func() {
-		err := recover()
-		if err != nil {
-			util.LogError("Execute command error : " + fmt.Sprintf("%s", err))
-		}
-	}()
-
-	if runtime.GOOS == "windows" {
-		output, _ := exec.Command("cmd", "/C", cmd).Output()
-		return string(output)
-	}
-	if runtime.GOOS == "linux" {
-		output, _ := exec.Command("sh", "-c", cmd).Output()
-		return string(output)
-	}
-
-	return ""
-}
 
 type ProbeUsage struct {
 	Cpu       Cpu         `json:"cpu"`
@@ -89,12 +16,10 @@ type ProbeUsage struct {
 	Net       Net         `json:"net"`
 	Process   Process     `json:"process"`
 	Load      Load        `json:"load"`
-	Unix      int64       `json:"unix"`
 }
 
 type Cpu struct {
-	Total float64   `json:"total"`
-	Per   []float64 `json:"per"`
+	Total float64 `json:"total"`
 }
 
 type Mem struct {
@@ -106,13 +31,13 @@ type Swap struct {
 }
 
 type Disk struct {
-	Name  string `json:name`
-	Read  uint64 `json:read`
+	Name  string `json:"name"`
+	Read  uint64 `json:"read"`
 	Write uint64 `json:"write"`
 }
 
 type Partition struct {
-	Device string `json:"device""`
+	Device string `json:"device"`
 	Used   uint64 `json:"used"`
 }
 
@@ -136,7 +61,6 @@ type ProbeInfo struct {
 	CpuInfo  CpuInfo    `json:"cpu"`
 	MemInfo  MemInfo    `json:"mem"`
 	DiskInfo []DiskInfo `json:"disk"`
-	NetInfo  NetInfo    `json:"net"`
 }
 
 type HostInfo struct {
@@ -172,32 +96,58 @@ type DiskInfo struct {
 	Total      uint64 `json:"total"`
 }
 
-type NetInfo struct {
-	PublicIp   string `json:"publicIp"`
-	PrivateIp  string `json:"privateIp"`
-	WsIp       string `json:"wsIp"`
-	AgentIp    string `json:"agentIp"`
-	ApiIp      string `json:"apiIp"`
-	DetailInfo IpInfo `json:"detail"`
+func GetServerInfo() []byte {
+
+	defer func() {
+		err := recover()
+		if err != nil {
+			log.Error("Get server info data error : " + fmt.Sprintf("%s", err))
+		}
+	}()
+
+	probeInfo := ProbeInfo{}
+	probeInfo.Version = config.Version
+	probeInfo.HostInfo = GetHostInfo()
+	probeInfo.CpuInfo = GetCpuInfo()
+	probeInfo.MemInfo = GetMemInfo()
+	probeInfo.DiskInfo = GetDiskInfo()
+
+	msg, _ := json.Marshal(probeInfo)
+
+	resultMap := make(map[string]string)
+	resultMap["serverId"] = config.GetSid()
+	resultMap["msg"] = string(msg)
+	result, _ := json.Marshal(resultMap)
+
+	return result
 }
 
-type IpInfo struct {
-	Status        string  `json:"status"`
-	Continent     string  `json:"continent"`
-	ContinentCode string  `json:"continentCode"`
-	Country       string  `json:"country"`
-	CountryCode   string  `json:"countryCode"`
-	Region        string  `json:"region"`
-	RegionName    string  `json:"regionName"`
-	City          string  `json:"city"`
-	District      string  `json:"district"`
-	Zip           string  `json:"zip"`
-	Lat           float64 `json:"lat"`
-	Lon           float64 `json:"lon"`
-	Timezone      string  `json:"timezone"`
-	Isp           string  `json:"isp"`
-	Org           string  `json:"org"`
-	As            string  `json:"as"`
-	Asname        string  `json:"asname"`
-	Query         string  `json:"query"`
+func GetServerUsage() []byte {
+
+	defer func() {
+		err := recover()
+		if err != nil {
+			log.Error("Sending usage data error : " + fmt.Sprintf("%s", err))
+		}
+	}()
+
+	probeUsage := ProbeUsage{}
+	probeUsage.Cpu = GetCpuUsage()
+	probeUsage.Mem = GetMemUsage()
+	probeUsage.Swap = GetSwapUsage()
+	probeUsage.Disk = GetDiskUsage()
+	probeUsage.Partition = GetPartitionUsage()
+	probeUsage.Net = GetNetUsage()
+	probeUsage.Process.Num = GetProcessNum()
+	probeUsage.Process.ProcessList = GetProcessUsage()
+	probeUsage.Load.SysLoad = GetLoadUsage()
+
+	msg, _ := json.Marshal(probeUsage)
+
+	resultMap := make(map[string]string)
+	resultMap["serverId"] = config.GetSid()
+	resultMap["msg"] = string(msg)
+	result, _ := json.Marshal(resultMap)
+
+	return result
 }

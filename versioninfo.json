@@ -2,13 +2,13 @@
   "FixedFileInfo": {
     "FileVersion": {
       "Major": 1,
-      "Minor": 0,
-      "Patch": 3
+      "Minor": 1,
+      "Patch": 0
     },
     "ProductVersion": {
       "Major": 1,
-      "Minor": 0,
-      "Patch": 3,
+      "Minor": 1,
+      "Patch": 0,
       "Build": 0
     },
     "FileFlagsMask": "3f",
@@ -21,14 +21,14 @@
     "Comments": "Nodepanels probe",
     "CompanyName": "Nodepanels",
     "FileDescription": "Nodepanels probe",
-    "FileVersion": "v1.0.3",
+    "FileVersion": "v1.1.0",
     "InternalName": "nodepanels-probe.exe",
     "LegalCopyright": "Copyright (c) 2022 Nodepanels",
     "LegalTrademarks": "",
     "OriginalFilename": "nodepanels-probe.exe",
     "PrivateBuild": "",
     "ProductName": "Nodepanels-probe",
-    "ProductVersion": "v1.0.3",
+    "ProductVersion": "v1.1.0",
     "SpecialBuild": ""
   },
   "VarFileInfo": {
