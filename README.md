@@ -14,7 +14,7 @@ Nodepanels探针，采集服务器基础数据，服务器与本系统的连接�
 
 更新日期：`2022/06/01`
 
-支持系统：`Linux 32/64位` | `Linux ARM 32/64位` | `Windows 32/64位`
+支持系统：`Linux 32/64位` | `Linux ARM 32/64位` | `Windows 32/64位` | `Windows ARM 32/64位`
 
 ### 采集的数据：
 
