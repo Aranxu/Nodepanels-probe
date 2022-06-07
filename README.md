@@ -1,6 +1,6 @@
 # <img src="https://github.com/Aranxu/Nodepanels-probe/blob/main/favicon.ico" width = "40" height = "40" alt="" align=center/> Nodepanels-probe
 
-<img src="https://img.shields.io/badge/Go-1.17-ff69b4"/> <img src="https://img.shields.io/badge/version-v1.0.3-orange"/> <img src="https://img.shields.io/badge/TG-@nodepanels-green?logo=telegram&style=plastic"/>
+<img src="https://img.shields.io/badge/Go-1.18-ff69b4"/> <img src="https://img.shields.io/badge/version-v1.1.0-orange"/> <img src="https://img.shields.io/badge/TG-@nodepanels-green?logo=telegram&style=plastic"/>
 
 Nodepanels探针，采集服务器基础数据，服务器与本系统的连接通道
 
@@ -10,11 +10,11 @@ Nodepanels探针，采集服务器基础数据，服务器与本系统的连接�
 
 ### 程序信息：
 
-版本：`v1.0.3`
+版本：`v1.1.0`
 
-更新日期：`2022/03/14`
+更新日期：`2022/06/01`
 
-支持系统：`Linux 32/64位` | `Linux ARM 32/64位` | `Windows 32/64位`
+支持系统：`Linux 32/64位` | `Linux ARM 32/64位` | `Windows 32/64位` | `Windows ARM 32/64位`
 
 ### 采集的数据：
 
@@ -93,7 +93,6 @@ Nodepanels探针，采集服务器基础数据，服务器与本系统的连接�
   <br>
   <ul>
     <li>公网IP</li>
-    <li>私网IP</li>
     <li>磁盘IO</li>
     <li>网络进出流量</li>
   </ul>
@@ -125,9 +124,23 @@ Nodepanels探针，采集服务器基础数据，服务器与本系统的连接�
         </tr>
         <tr>
             <th>Linux、Windows代码隔离</th>
+            <th>✔</th>
+            <th>100%</th>
+            <th>2022.06.01</th>
             <th></th>
-            <th>0%</th>
+        </tr>
+        <tr>
+            <th>支持获取2秒粒度数据</th>
+            <th>✔</th>
+            <th>100%</th>
+            <th>2022.06.01</th>
             <th></th>
+        </tr>
+        <tr>
+            <th>每10分钟更新系统软硬件信息</th>
+            <th>✔</th>
+            <th>100%</th>
+            <th>2022.06.01</th>
             <th></th>
         </tr>
     </table>
