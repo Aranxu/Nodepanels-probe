@@ -127,7 +127,7 @@ func handleMsg(message string) {
 // SendUsage 新开线程循环获取系统使用率(2秒粒度)
 func SendUsage() {
 	for {
-		if WebsocketConn != nil && config.GetConfig().Usage > timex.NowUnix() {
+		if WebsocketConn != nil && config.C.Usage > timex.NowUnix() {
 			go SendMsg(PrintResult(config.GetSid(), "usage", usage.Usage()))
 		}
 		time.Sleep(2 * time.Second)

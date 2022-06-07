@@ -22,7 +22,7 @@ func GetProcessUsage() []ProcessUsage {
 		initProcessUsageMap = make(map[string]ProcessUsage)
 	}
 
-	processCmdList := config.GetConfig().Monitor.Rule.Process
+	processCmdList := config.C.Monitor.Rule.Process
 	processCmdMap := make(map[string]int)
 	for _, val := range processCmdList {
 		processCmdMap[val] = 1

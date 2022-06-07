@@ -2,12 +2,10 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/go-ping/ping"
 	"github.com/gookit/goutil/jsonutil"
 	"github.com/gookit/goutil/timex"
 	"io/ioutil"
-	"nodepanels-probe/log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -22,18 +20,20 @@ var ApiUrl = "https://collect.nodepanels.com"
 var WsUrl = "wss://ws.nodepanels.com"
 
 var BinPath = ExePath()
+var C = Config{}
 
 // InitConfig 初始化配置文件
 func InitConfig() {
-	c := GetConfig()
-	c.Usage = timex.NowAddMinutes(-1).Unix()
-	SetConfig(c)
+	f, _ := ioutil.ReadFile(filepath.Join(BinPath, "config.json"))
+	json.Unmarshal(f, &C)
+
+	C.Usage = timex.NowAddMinutes(-1).Unix()
+	SetConfig()
 }
 
 func InitConfigUsage() {
-	c := GetConfig()
-	c.Usage = timex.NowAddMinutes(1).Unix()
-	SetConfig(c)
+	C.Usage = timex.NowAddMinutes(1).Unix()
+	SetConfig()
 }
 
 // InitRequestIp 初始化请求地址
@@ -54,43 +54,11 @@ func InitRequestIp() {
 
 // GetSid 获取服务器id
 func GetSid() string {
-
-	defer func() {
-		err := recover()
-		if err != nil {
-			log.Error("Get host id error : " + fmt.Sprintf("%s", err))
-		}
-	}()
-
-	return strings.Split(GetConfig().ServerId, "\n")[0]
+	return C.ServerId
 }
 
-// GetConfig 获取配置文件
-func GetConfig() Config {
-
-	defer func() {
-		err := recover()
-		if err != nil {
-			fmt.Println("Get config error : " + fmt.Sprintf("%s", err))
-		}
-	}()
-
-	f, err := ioutil.ReadFile(filepath.Join(BinPath, "config.json"))
-	if err != nil {
-		return Config{}
-	}
-
-	c := Config{}
-	err = json.Unmarshal(f, &c)
-	if err != nil {
-		return Config{}
-	}
-
-	return c
-}
-
-func SetConfig(c Config) {
-	json, _ := jsonutil.EncodePretty(c)
+func SetConfig() {
+	json, _ := jsonutil.EncodePretty(C)
 	ioutil.WriteFile(filepath.Join(BinPath, "config.json"), json, 0666)
 }
 
