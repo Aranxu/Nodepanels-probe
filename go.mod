@@ -1,21 +1,20 @@
 module nodepanels-probe
 
-go 1.18
+go 1.21
 
 require (
-	github.com/go-ping/ping v1.1.0
-	github.com/gookit/goutil v0.5.2
+	github.com/gookit/goutil v0.6.15
 	github.com/gorilla/websocket v1.5.0
 	github.com/kardianos/service v1.2.1
 	github.com/shirou/gopsutil/v3 v3.22.4
 )
 
 require (
-	github.com/google/uuid v1.2.0 // indirect
-	github.com/mattn/go-isatty v0.0.14 // indirect
-	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	golang.org/x/net v0.0.0-20210316092652-d523dce5a7f4 // indirect
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
+	github.com/gookit/color v1.5.4 // indirect
+	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
+	golang.org/x/sync v0.5.0 // indirect
+	golang.org/x/term v0.15.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 )
 
 require (
@@ -26,5 +25,5 @@ require (
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
+	golang.org/x/sys v0.15.0 // indirect
 )

@@ -63,7 +63,7 @@ func Entry() {
 			fmt.Println("====================================")
 			fmt.Println("App name    : nodepanels-probe")
 			fmt.Println("Version     : " + config.Version)
-			fmt.Println("Update Time : 20220525")
+			fmt.Println("Update Time : 20240119")
 			fmt.Println("")
 			fmt.Println("Made by     : https://nodepanels.com")
 			fmt.Println("====================================")

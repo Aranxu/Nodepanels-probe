@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"github.com/go-ping/ping"
 	"github.com/gookit/goutil/jsonutil"
 	"github.com/gookit/goutil/timex"
 	"io/ioutil"
@@ -10,10 +9,9 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
-const Version = "v1.1.0"
+const Version = "v1.1.2"
 
 var AgentUrl = "https://agent.nodepanels.com"
 var ApiUrl = "https://collect.nodepanels.com"
@@ -34,22 +32,6 @@ func InitConfig() {
 func InitConfigUsage() {
 	C.Usage = timex.NowAddMinutes(1).Unix()
 	SetConfig()
-}
-
-// InitRequestIp 初始化请求地址
-func InitRequestIp() {
-	pinger, _ := ping.NewPinger(strings.Split(strings.Split(AgentUrl, "://")[1], ":")[0])
-	pinger.Count = 4
-	pinger.SetPrivileged(true)
-	pinger.Timeout = time.Millisecond * 100
-	pinger.Run()
-	stats := pinger.Statistics()
-	if stats.AvgRtt.Nanoseconds() == 0 {
-		//如果默认请求域名延迟太高，则使用备用域名
-		AgentUrl = "https://cn.agent.nodepanels.com"
-		ApiUrl = "https://cn.collect.nodepanels.com"
-		WsUrl = "wss://cn.ws.nodepanels.com"
-	}
 }
 
 // GetSid 获取服务器id

@@ -25,7 +25,6 @@ func CheckTool(command Command) bool {
 	} else {
 		return DownloadTool(command)
 	}
-	return false
 }
 
 // DownloadTool 下载工具包
@@ -39,7 +38,7 @@ func DownloadTool(command Command) bool {
 	}()
 
 	PrintResult(command.Page, command.Tool.Type, "TOOLUPDATINGBEGIN")
-	var url = "https://nodepanels-file-1256221051.cos.accelerate.myqcloud.com/tool/prod/" + command.Tool.Version + "/nodepanels-tool-" + runtime.GOOS + "-" + runtime.GOARCH
+	var url = "https://file.nodepanels.com/tool/" + command.Tool.Version + "/nodepanels-tool-" + runtime.GOOS + "-" + runtime.GOARCH
 
 	util.Download(url, filepath.Join(config.BinPath, "nodepanels-tool"))
 

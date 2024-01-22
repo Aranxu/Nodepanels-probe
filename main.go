@@ -18,7 +18,6 @@ func main() {
 
 func init() {
 	config.InitConfig()
-	config.InitRequestIp()
 	probe.InitDiskIO()
 	probe.InitNet()
 }
